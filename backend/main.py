@@ -1,27 +1,18 @@
 """Kavach — Legal AI Trust Platform
 
-Main FastAPI application with complete feature set.
+Main FastAPI application with complete sophisticated feature set.
 """
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import HTMLResponse
-from pydantic import BaseModel
-from typing import Optional, List, Dict, Any
-import time
-import json
 
-from ai.kavach_engine import KavachEngine
-from ai.citation_verifier import CitationVerifier
-from ai.privilege_shield import PrivilegeShield
-from ai.confidence_scorer import ConfidenceScorer
-from ai.audit_trail import AuditTrail
-from ai.case_predictor import CasePredictor
+from api.routes import router
 
 app = FastAPI(
     title="Kavach",
     description="Legal AI Trust Platform — Making AI safe, reliable, and defensible for legal practice",
-    version="1.0.0",
+    version="2.0.0",
 )
 
 app.add_middleware(
@@ -32,28 +23,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Request/Response models
-class AnalyzeRequest(BaseModel):
-    text: str
-    user_id: Optional[str] = None
-    options: Optional[Dict[str, Any]] = None
+app.include_router(router, prefix="/api")
 
-class VerifyCitationRequest(BaseModel):
-    citation: str
-
-class ScanPrivilegeRequest(BaseModel):
-    text: str
-
-class PredictCaseRequest(BaseModel):
-    case_type: Optional[str] = None
-    facts: Dict[str, Any]
-
-class GenerateDocumentRequest(BaseModel):
-    document_type: str
-    facts: Dict[str, Any]
-    jurisdiction: Optional[str] = "Maharashtra"
-
-# Health check
 @app.get("/", response_class=HTMLResponse)
 async def root():
     return """
@@ -62,231 +33,96 @@ async def root():
     <head>
         <title>Kavach API</title>
         <style>
-            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
-            h1 { color: #059669; }
-            .endpoint { background: #f3f4f6; padding: 15px; margin: 10px 0; border-radius: 8px; }
-            .method { color: white; padding: 3px 8px; border-radius: 4px; font-weight: bold; }
+            body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 1000px; margin: 50px auto; padding: 20px; background: #f8fafc; }
+            h1 { color: #059669; font-size: 2.5rem; }
+            h2 { color: #334155; margin-top: 2rem; }
+            .endpoint { background: white; padding: 20px; margin: 15px 0; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+            .method { color: white; padding: 4px 10px; border-radius: 6px; font-weight: bold; font-size: 12px; }
             .post { background: #3b82f6; }
             .get { background: #22c55e; }
+            .feature { display: inline-block; background: #ecfdf5; color: #059669; padding: 4px 12px; border-radius: 20px; margin: 4px; font-size: 14px; }
+            code { background: #f1f5f9; padding: 2px 6px; border-radius: 4px; font-family: monospace; }
         </style>
     </head>
     <body>
         <h1>🛡️ Kavach — Legal AI Trust Platform</h1>
-        <p>Making AI safe, reliable, and defensible for legal practice</p>
+        <p style="color: #64748b; font-size: 1.1rem;">Making AI safe, reliable, and defensible for legal practice</p>
+        
+        <div style="margin: 20px 0;">
+            <span class="feature">📜 Citation Verification</span>
+            <span class="feature">🔒 Privilege Shield</span>
+            <span class="feature">📊 Confidence Scoring</span>
+            <span class="feature">🔍 Multi-Agent Verification</span>
+            <span class="feature">🎯 Vector Similarity</span>
+            <span class="feature">🕸️ Citation Graph</span>
+            <span class="feature">📋 Contract Analysis</span>
+            <span class="feature">⚡ Advanced RAG</span>
+        </div>
         
         <h2>API Endpoints</h2>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/analyze</strong>
-            <p>Complete trust analysis: citations + privilege + confidence scoring</p>
+            <span class="method post">POST</span> <strong>/api/analyze</strong>
+            <p>Complete trust analysis with all sophisticated features</p>
         </div>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/verify-citation</strong>
-            <p>Verify a single case citation</p>
+            <span class="method post">POST</span> <strong>/api/verify</strong>
+            <p>Multi-agent verification pipeline (5 specialized agents)</p>
         </div>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/scan-privilege</strong>
-            <p>Scan text for privileged content</p>
+            <span class="method post">POST</span> <strong>/api/analyze-contract</strong>
+            <p>Comprehensive contract clause extraction and risk analysis</p>
         </div>
         
         <div class="endpoint">
-            <span class="method post">POST</span> <strong>/predict-case</strong>
-            <p>Predict case outcome based on facts</p>
+            <span class="method post">POST</span> <strong>/api/verify-citation</strong>
+            <p>Verify single citation with detailed analysis</p>
         </div>
         
         <div class="endpoint">
-            <span class="method get">GET</span> <strong>/audit/history</strong>
+            <span class="method post">POST</span> <strong>/api/scan-privilege</strong>
+            <p>Scan for privileged content with detailed report</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/find-similar-cases</strong>
+            <p>Find similar cases using vector similarity</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/citation-graph</strong>
+            <p>Get citation graph with PageRank analysis</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/citation-influence/{case_id}</strong>
+            <p>Get detailed influence metrics for a case</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method post">POST</span> <strong>/api/batch-verify</strong>
+            <p>Verify multiple citations at once</p>
+        </div>
+        
+        <div class="endpoint">
+            <span class="method get">GET</span> <strong>/api/audit/history</strong>
             <p>Get audit trail history</p>
         </div>
         
-        <div class="endpoint">
-            <span class="method get">GET</span> <strong>/audit/report</strong>
-            <p>Generate audit report</p>
-        </div>
+        <p style="margin-top: 2rem;"><a href="/docs" style="color: #059669; font-weight: bold;">📖 Interactive API Documentation (Swagger UI)</a></p>
+        <p><a href="/redoc" style="color: #059669;">📚 API Documentation (ReDoc)</a></p>
         
-        <p><a href="/docs">📖 Interactive API Documentation (Swagger)</a></p>
-        <p><a href="/redoc">📚 API Documentation (ReDoc)</a></p>
+        <hr style="margin: 2rem 0; border: none; border-top: 1px solid #e2e8f0;">
+        <p style="color: #94a3b8; font-size: 14px;">Kavach v2.0.0 — Built for WashU Law Vibe Coding Challenge 2026</p>
     </body>
     </html>
     """
 
 @app.get("/health")
 async def health():
-    return {"status": "healthy", "service": "kavach", "version": "1.0.0"}
-
-# Main analysis endpoint
-@app.post("/analyze")
-async def analyze_text(request: AnalyzeRequest):
-    """Complete Kavach analysis: citations + privilege + confidence + prediction"""
-    engine = KavachEngine()
-    result = await engine.analyze(request.text, request.user_id)
-    
-    # Try to predict case type if requested
-    prediction = None
-    if request.options and request.options.get("predict_case"):
-        predictor = CasePredictor()
-        facts = {"text": request.text, **request.options.get("facts", {})}
-        prediction = predictor.predict(request.options.get("case_type", ""), facts)
-    
-    return {
-        "input_text": result.input_text,
-        "citations": [
-            {
-                "citation": c.citation,
-                "is_valid": c.is_valid,
-                "confidence": c.confidence,
-                "verified_source": c.verified_source,
-                "case_title": c.case_title,
-                "year": c.year,
-                "court": c.court,
-                "actual_text": c.actual_text,
-            }
-            for c in result.citations
-        ],
-        "privilege_detections": [
-            {
-                "text": d.text,
-                "start": d.start,
-                "end": d.end,
-                "privilege_type": d.privilege_type.value,
-                "confidence": d.confidence,
-                "suggested_redaction": d.suggested_redaction,
-                "severity": d.severity,
-            }
-            for d in result.privilege_detections
-        ],
-        "confidence_score": {
-            "overall": result.confidence_score.overall,
-            "citation_accuracy": result.confidence_score.citation_accuracy,
-            "source_reliability": result.confidence_score.source_reliability,
-            "privilege_safety": result.confidence_score.privilege_safety,
-            "factors": result.confidence_score.factors,
-        },
-        "redacted_text": result.redacted_text,
-        "audit_entry_id": result.audit_entry_id,
-        "processing_time_ms": result.processing_time_ms,
-        "recommendation": result.recommendation,
-        "prediction": {
-            "case_type": prediction.case_type,
-            "win_probability": prediction.win_probability,
-            "likely_outcome": prediction.likely_outcome,
-            "timeline_months": prediction.timeline_months,
-            "risk_factors": prediction.risk_factors,
-            "similar_cases": prediction.similar_cases,
-        } if prediction else None,
-    }
-
-# Single citation verification
-@app.post("/verify-citation")
-async def verify_citation(request: VerifyCitationRequest):
-    """Verify a single citation"""
-    verifier = CitationVerifier()
-    result = await verifier.verify_citation(request.citation)
-    
-    return {
-        "citation": result.citation,
-        "is_valid": result.is_valid,
-        "confidence": result.confidence,
-        "verified_source": result.verified_source,
-        "case_title": result.case_title,
-        "year": result.year,
-        "court": result.court,
-        "actual_text": result.actual_text,
-    }
-
-# Privilege scanning
-@app.post("/scan-privilege")
-async def scan_privilege(request: ScanPrivilegeRequest):
-    """Scan text for privileged content"""
-    shield = PrivilegeShield()
-    detections = shield.scan(request.text)
-    report = shield.generate_report(request.text, detections)
-    
-    return {
-        "detections": [
-            {
-                "text": d.text,
-                "start": d.start,
-                "end": d.end,
-                "privilege_type": d.privilege_type.value,
-                "confidence": d.confidence,
-                "suggested_redaction": d.suggested_redaction,
-                "severity": d.severity,
-            }
-            for d in detections
-        ],
-        "report": report,
-    }
-
-# Case prediction
-@app.post("/predict-case")
-async def predict_case(request: PredictCaseRequest):
-    """Predict case outcome"""
-    predictor = CasePredictor()
-    prediction = predictor.predict(request.case_type or "", request.facts)
-    
-    return {
-        "case_type": prediction.case_type,
-        "win_probability": prediction.win_probability,
-        "likely_outcome": prediction.likely_outcome,
-        "key_factors": prediction.key_factors,
-        "remedies": prediction.remedies,
-        "timeline_months": prediction.timeline_months,
-        "risk_factors": prediction.risk_factors,
-        "similar_cases": prediction.similar_cases,
-        "confidence": prediction.confidence,
-    }
-
-# Audit endpoints
-@app.get("/audit/history")
-async def get_audit_history(action: Optional[str] = None, limit: int = 100):
-    """Get audit trail history"""
-    trail = AuditTrail()
-    entries = trail.get_history(action=action, limit=limit)
-    
-    return {
-        "entries": [
-            {
-                "entry_id": e.entry_id,
-                "timestamp": e.timestamp,
-                "action": e.action,
-                "status": e.status,
-                "duration_ms": e.duration_ms,
-            }
-            for e in entries
-        ]
-    }
-
-@app.get("/audit/report")
-async def get_audit_report():
-    """Generate audit report"""
-    trail = AuditTrail()
-    report = trail.generate_report()
-    return report
-
-# Batch verification
-@app.post("/batch-verify")
-async def batch_verify_citations(citations: List[str]):
-    """Verify multiple citations at once"""
-    verifier = CitationVerifier()
-    results = await verifier.verify_citations(citations)
-    
-    return {
-        "total": len(results),
-        "verified": sum(1 for r in results if r.is_valid),
-        "unverified": sum(1 for r in results if not r.is_valid),
-        "results": [
-            {
-                "citation": r.citation,
-                "is_valid": r.is_valid,
-                "confidence": r.confidence,
-                "case_title": r.case_title,
-            }
-            for r in results
-        ]
-    }
+    return {"status": "healthy", "service": "kavach", "version": "2.0.0"}
 
 if __name__ == "__main__":
     import uvicorn
