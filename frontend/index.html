@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NyayaAI — Indian Legal Intelligence Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .gradient-bg { background: linear-gradient(135deg, #1e3a5f 0%, #0d1b2a 100%); }
+        .card-hover:hover { transform: translateY(-2px); box-shadow: 0 10px 40px rgba(0,0,0,0.1); }
+        .typing-animation { border-right: 2px solid #3b82f6; animation: blink 1s infinite; }
+        @keyframes blink { 0%, 50% { border-color: transparent; } 51%, 100% { border-color: #3b82f6; } }
+        .fade-in { animation: fadeIn 0.5s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Navigation -->
+    <nav class="gradient-bg text-white py-4 px-6 shadow-lg">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-3">
+                <div class="w-10 h-10 bg-blue-500 rounded-lg flex items-center justify-center">
+                    <span class="text-xl font-bold">न्याय</span>
+                </div>
+                <span class="text-xl font-semibold">NyayaAI</span>
+            </div>
+            <div class="text-sm text-blue-200">WashU Law Vibe Coding Challenge 2026</div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <div class="gradient-bg text-white py-16 px-6">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-5xl font-bold mb-6">
+                Describe Your Legal Problem.<br>
+                <span class="text-blue-300">Get a Complete Legal Package.</span>
+            </h1>
+            <p class="text-xl text-blue-100 mb-8">
+                NyayaAI transforms natural language into ready-to-file legal documents, 
+                cites relevant case law, and provides litigation strategy — all in seconds.
+            </p>
+            <div class="flex justify-center space-x-4">
+                <a href="#demo" class="bg-white text-blue-900 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition">
+                    Try Demo
+                </a>
+                <a href="#features" class="border border-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition">
+                    Learn More
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Demo Section -->
+    <div id="demo" class="py-16 px-6">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Try It Now</h2>
+            
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Input Panel -->
+                <div class="bg-white rounded-xl shadow-lg p-6">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">Describe Your Legal Problem</h3>
+                    <textarea 
+                        id="problem-input"
+                        class="w-full h-40 p-4 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        placeholder="Example: My landlord is refusing to return my security deposit of ₹50,000 after I vacated the apartment. He's claiming damages but never gave me an itemized list."
+                    ></textarea>
+                    <div class="mt-4 flex space-x-4">
+                        <button 
+                            onclick="analyzeProblem()"
+                            class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition"
+                        >
+                            Analyze & Generate
+                        </button>
+                        <select id="jurisdiction" class="border border-gray-200 rounded-lg px-4">
+                            <option value="">Auto-detect</option>
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Delhi">Delhi</option>
+                            <option value="Karnataka">Karnataka</option>
+                            <option value="Tamil Nadu">Tamil Nadu</option>
+                            <option value="West Bengal">West Bengal</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Output Panel -->
+                <div id="output-panel" class="bg-white rounded-xl shadow-lg p-6 hidden">
+                    <div id="loading" class="hidden text-center py-12">
+                        <div class="animate-spin w-12 h-12 border-4 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+                        <p class="text-gray-600">Analyzing legal issue...</p>
+                    </div>
+                    
+                    <div id="results" class="hidden">
+                        <!-- Issue Detection -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Issue Detected</h4>
+                            <p id="issue-detected" class="text-lg font-medium text-gray-800"></p>
+                        </div>
+
+                        <!-- Applicable Laws -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Applicable Laws</h4>
+                            <div id="applicable-laws" class="flex flex-wrap gap-2"></div>
+                        </div>
+
+                        <!-- Court Recommendation -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Recommended Court</h4>
+                            <p id="court-recommendation" class="text-gray-700"></p>
+                        </div>
+
+                        <!-- Strategy Brief -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Strategy Brief</h4>
+                            <p id="strategy-brief" class="text-gray-700"></p>
+                        </div>
+
+                        <!-- Generated Documents -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Generated Documents</h4>
+                            <div id="documents-list" class="space-y-3"></div>
+                        </div>
+
+                        <!-- Deadlines -->
+                        <div class="mb-6 fade-in">
+                            <h4 class="text-sm font-semibold text-blue-600 uppercase tracking-wide mb-2">Important Deadlines</h4>
+                            <div id="deadlines-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features Section -->
+    <div id="features" class="py-16 px-6 bg-white">
+        <div class="max-w-6xl mx-auto">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-800">Why NyayaAI?</h2>
+            
+            <div class="grid md:grid-cols-3 gap-8">
+                <div class="text-center p-6 rounded-xl bg-blue-50 card-hover transition">
+                    <div class="w-16 h-16 bg-blue-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Instant Analysis</h3>
+                    <p class="text-gray-600">Transform hours of legal research into seconds. Get comprehensive analysis instantly.</p>
+                </div>
+
+                <div class="text-center p-6 rounded-xl bg-green-50 card-hover transition">
+                    <div class="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Ready-to-File Documents</h3>
+                    <p class="text-gray-600">Generate legal notices, complaints, and applications with proper formatting and citations.</p>
+                </div>
+
+                <div class="text-center p-6 rounded-xl bg-purple-50 card-hover transition">
+                    <div class="w-16 h-16 bg-purple-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2 text-gray-800">Deadline Tracking</h3>
+                    <p class="text-gray-600">Never miss a deadline. Auto-calculate limitation periods and procedural timelines.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="py-12 px-6 bg-gray-100">
+        <div class="max-w-4xl mx-auto">
+            <div class="grid grid-cols-3 gap-8 text-center">
+                <div>
+                    <div class="text-4xl font-bold text-blue-600">4 Cr+</div>
+                    <div class="text-gray-600">Pending Cases in India</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-green-600">80%</div>
+                    <div class="text-gray-600">Can't Afford a Lawyer</div>
+                </div>
+                <div>
+                    <div class="text-4xl font-bold text-purple-600">10x</div>
+                    <div class="text-gray-600">Faster with NyayaAI</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="gradient-bg text-white py-8 px-6">
+        <div class="max-w-6xl mx-auto text-center">
+            <p class="text-blue-200">Built for WashU Law International Vibe Coding Challenge 2026</p>
+            <p class="text-sm text-blue-300 mt-2">Using Codex + Nous Portal • Vibe Coding in Action</p>
+        </div>
+    </footer>
+
+    <script>
+        async function analyzeProblem() {
+            const problem = document.getElementById('problem-input').value;
+            const jurisdiction = document.getElementById('jurisdiction').value;
+            
+            if (!problem.trim()) {
+                alert('Please describe your legal problem');
+                return;
+            }
+
+            // Show output panel and loading
+            document.getElementById('output-panel').classList.remove('hidden');
+            document.getElementById('loading').classList.remove('hidden');
+            document.getElementById('results').classList.add('hidden');
+
+            // Simulate API call (will be replaced with real backend)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Mock analysis result
+            const analysis = {
+                issue_detected: "Tenant-Landlord Security Deposit Dispute",
+                applicable_laws: [
+                    "Maharashtra Rent Control Act, 1999",
+                    "Indian Contract Act, 1872 - Section 108",
+                    "Consumer Protection Act, 2019"
+                ],
+                jurisdiction: jurisdiction || "Mumbai, Maharashtra",
+                court_recommendation: "Small Causes Court or Consumer Forum",
+                strategy_brief: "File a legal notice first to create pressure. If no response, approach the Small Causes Court for recovery of security deposit with interest. Alternative: Consumer Forum if landlord is a registered housing society.",
+                documents: [
+                    {
+                        document_type: "legal_notice",
+                        title: "Legal Notice under Section 80 CPC",
+                        content: "LEGAL NOTICE
+
+To,
+[Landlord Name]
+[Address]
+
+Date: " + new Date().toLocaleDateString('en-IN') + "
+
+Sir/Madam,
+
+I, [Tenant Name], through my advocate, do hereby serve this legal notice upon you...
+
+DEMAND: Return security deposit of ₹50,000 within 15 days..."
+                    },
+                    {
+                        document_type: "consumer_complaint",
+                        title: "Consumer Complaint under CPA, 2019",
+                        content: "IN THE CONSUMER DISPUTES REDRESSAL COMMISSION
+
+COMPLAINT NO: [To be filed]
+
+BETWEEN:
+[Tenant Name] ... COMPLAINANT
+VERSUS
+[Landlord Name] ... OPPOSITE PARTY
+
+COMPLAINT UNDER SECTION 35..."
+                    }
+                ],
+                deadlines: [
+                    {deadline: "Legal notice response", date: new Date(Date.now() + 15*24*60*60*1000).toLocaleDateString('en-IN')},
+                    {deadline: "Consumer complaint filing", date: new Date(Date.now() + 45*24*60*60*1000).toLocaleDateString('en-IN')},
+                    {deadline: "Limitation period", date: new Date(Date.now() + 3*365*24*60*60*1000).toLocaleDateString('en-IN')}
+                ]
+            };
+
+            // Display results
+            document.getElementById('loading').classList.add('hidden');
+            document.getElementById('results').classList.remove('hidden');
+
+            document.getElementById('issue-detected').textContent = analysis.issue_detected;
+            
+            const lawsContainer = document.getElementById('applicable-laws');
+            lawsContainer.innerHTML = analysis.applicable_laws.map(law => 
+                `<span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm">${law}</span>`
+            ).join('');
+
+            document.getElementById('court-recommendation').textContent = analysis.court_recommendation;
+            document.getElementById('strategy-brief').textContent = analysis.strategy_brief;
+
+            const docsContainer = document.getElementById('documents-list');
+            docsContainer.innerHTML = analysis.documents.map(doc => `
+                <div class="p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h5 class="font-medium text-gray-800 mb-2">${doc.title}</h5>
+                    <p class="text-sm text-gray-600 mb-3">${doc.content.substring(0, 150)}...</p>
+                    <button class="text-blue-600 text-sm font-medium hover:text-blue-800">View Full Document →</button>
+                </div>
+            `).join('');
+
+            const deadlinesContainer = document.getElementById('deadlines-list');
+            deadlinesContainer.innerHTML = analysis.deadlines.map(d => `
+                <div class="flex justify-between items-center p-3 bg-yellow-50 rounded-lg border border-yellow-200">
+                    <span class="text-gray-700">${d.deadline}</span>
+                    <span class="font-medium text-yellow-800">${d.date}</span>
+                </div>
+            `).join('');
+        }
+    </script>
+</body>
+</html>
